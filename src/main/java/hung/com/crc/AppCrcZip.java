@@ -14,12 +14,27 @@ import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 /**
-CRC là giải thuật check sum để check toàn vẹn dữ liệu
- *
+ * CRC là giải thuật check sum để check toàn vẹn dữ liệu.
+ * CRC là dạng đơn giản của giải thuật Hashing
+ */
+/**
+ * Zip file là chuẩn rồi. Cấu trúc zip qui định thành chuẩn. Phương pháp mã hóa cũng thành chuẩn.
+ * https://en.wikipedia.org/wiki/Zip_(file_format)
+ * “compression methods”
+   http://www.baeldung.com/java-compress-and-uncompress
+   Java zip cũng  tính toán CRC32 (32 bits). Giá trị này là giá trị của data trước khi zip dữ liệu.
+   CRC (Cyclic Redundancy Check): tính toán để kiểm tra toàn vẹn dữ liệu, giống checksum.
+   CRC của Zip và CRC32 tính toán là giống nhau đều cho ra kết quả giống nhau (đã test)
+    https://en.wikipedia.org/wiki/Cyclic_redundancy_check
+
  */
 public class AppCrcZip {
-
+	private static Logger log = LogManager.getLogger(); 
+	
     public static void main(String[] args) throws IOException {
     	
     	//========================= check zip CRC 32 ========================
@@ -42,7 +57,7 @@ public class AppCrcZip {
 			//CRC32 giá trị ban đầu = FFFFFFFFFFFFFFFF = long = 8bytes = 64bit
 			//tuy nhiên CRC32 chỉ dùng 4byte = 32 bit
 			//CRC là giá trị của data trước khi zip
-			System.out.format("the initial CRC32 1 =%X\n", entry.getCrc()); 
+			log.debug("the initial CRC32 1 =%X\n", entry.getCrc()); 
 			
 			//==== entry option
 			//entry.setCrc(crc); //zip sẽ tạo ra giá trị này
@@ -56,13 +71,13 @@ public class AppCrcZip {
             //entry.setComment("Created by TheCodersCorner");
 			zos.closeEntry();   //close 1 entry (= 1 file)
 			//mỗi entry Close thì sẽ tạo ra 1 check sum CRC
-			System.out.format("zip CRC32 1 =%X\n", entry.getCrc());
+			log.debug("zip CRC32 1 =%X\n", entry.getCrc());
 			
 			zos.close();//kết thúc Zip file
 			//baos.toByteArray()
 
-		} catch(IOException ioe) {
-			ioe.printStackTrace();
+		} catch(IOException e) {
+			log.error("fail", e);
 		}
 		
 		//================================= CRC 32 to compare with the above CRC32 of zip
@@ -71,7 +86,7 @@ public class AppCrcZip {
 		//giá trị tính toán này giống hệt với Zip ở trên
     	CRC32 crc1 = new CRC32();  //32bit check sum
     	crc1.update(byteArr1);
-    	System.out.format("****** CRC32 1 =%X\n", crc1.getValue());
+    	log.debug("****** CRC32 1 =%X\n", crc1.getValue());
     }
     
 

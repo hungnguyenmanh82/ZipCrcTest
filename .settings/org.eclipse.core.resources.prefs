@@ -1,9 +1,9 @@
 eclipse.preferences.version=1
 encoding//src/main/java/hung/com/crc/AppCRC32.java=UTF-8
 encoding//src/main/java/hung/com/crc/AppCrcZip.java=UTF-8
-encoding//src/main/java/hung/com/unzip/App1UnzipFile.java=UTF-8
+encoding//src/main/java/hung/com/unzip/App1_unzip_archive.java=UTF-8
 encoding//src/main/java/hung/com/unzip/App2InMemory.java=UTF-8
-encoding//src/main/java/hung/com/zip/App1StreamOut.java=UTF-8
-encoding//src/main/java/hung/com/zip/App2.java=UTF-8
-encoding//src/main/java/hung/com/zip/App3NioReadFile.java=UTF-8
-encoding//src/main/java/hung/com/zip/App4Directory.java=UTF-8
+encoding//src/main/java/hung/com/zip/App1_zip_to_bytes.java=UTF-8
+encoding//src/main/java/hung/com/zip/App2_zip_to_file.java=UTF-8
+encoding//src/main/java/hung/com/zip/App3_zip_file.java=UTF-8
+encoding//src/main/java/hung/com/zip/App4_zip_directory_recursively.java=UTF-8

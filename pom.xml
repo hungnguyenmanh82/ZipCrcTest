@@ -4,15 +4,61 @@
   <artifactId>zipTest</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   
-  	<build>
-		<!-- -->
+	<dependencies>
+		<!-- Version của api và core phải giống nhau, nếu ko sẽ báo lỗi -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.13.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.13.2</version>
+		</dependency>
+
+		<!-- Asynchronous Logging: nếu thiều lib này sẽ báo lỗi (need file log4j2.component.properties) -->
+		<!-- Synchronous logging: nếu thiếu lib này ko báo lỗi -->
+		<dependency>
+			<groupId>com.lmax</groupId>
+			<artifactId>disruptor</artifactId>
+			<version>3.4.2</version>
+		</dependency>
+
+		<!-- read/write file với thư viện apache -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.3.2</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.7.0</version>
+				<version>3.8.1</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<release>11</release>
+
+					<!-- Eclipse use it -->
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+			<!-- set system Properties khi debug F11 on Eclipse cho Log4j2 dùng với Vertx -->
+			<!-- system Properties khac với Enviroment Variable -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<systemPropertyVariables>
+						<!-- -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector -->
+						<Log4jContextSelector>org.apache.logging.log4j.core.async.AsyncLoggerContextSelector</Log4jContextSelector>
+						<!-- Dvertx.logger-delegate-factory-class-name=Log4j2LogDelegateFactory -->
+						<vertx.logger-delegate-factory-class-name>Log4j2LogDelegateFactory</vertx.logger-delegate-factory-class-name>
+					</systemPropertyVariables>
 				</configuration>
 			</plugin>
 		</plugins>

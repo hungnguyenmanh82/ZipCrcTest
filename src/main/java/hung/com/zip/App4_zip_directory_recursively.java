@@ -12,11 +12,20 @@ import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
 http://www.baeldung.com/java-compress-and-uncompress
  *
  */
-public class App4Directory {
+
+/**
+ * code này đã test chạy tốt. Lúc nào dùng thì bỏ các dòng log.debug() đi là ok
+ */
+public class App4_zip_directory_recursively {
+	private static Logger log = LogManager.getLogger(); 
+	
 
     public static void main(String[] args) throws IOException {
     	//"zipTestDirectory" is a recursive folder
@@ -30,24 +39,34 @@ public class App4Directory {
 
 		//============================	
         File fileToZip = new File(sourceFile);
-        zipFile(fileToZip, fileToZip.getName(), zipOut);
+        zipFile(fileToZip, fileToZip.getName(), zipOut); // .getName() = name ko gồm path
         zipOut.close();
         fos.close();
+        
+        log.debug("zip folder successfully");
     }
  
+    /**
+     * @param fileToZip: nếu là folder thì nó sẽ gọi hàm này recursively
+     */
     private static void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
         if (fileToZip.isHidden()) {
             return;
         }
+        
+        // if it is a folder then execute recursively
         if (fileToZip.isDirectory()) {
+        	log.debug("zip folder: " + fileName);
+        	
             File[] children = fileToZip.listFiles();
             for (File childFile : children) {
                 zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
             }
             return;
         }
+        // if it is a file
         FileInputStream fis = new FileInputStream(fileToZip);
-        ZipEntry zipEntry = new ZipEntry(fileName);
+        ZipEntry zipEntry = new ZipEntry(fileName); //fileName = relative path = "directory/name"
         zipOut.putNextEntry(zipEntry);
         byte[] bytes = new byte[1024];
         int length;
@@ -55,20 +74,8 @@ public class App4Directory {
             zipOut.write(bytes, 0, length);
         }
         fis.close();
+        log.debug("zip file: " + fileName);
     }
-	/**
-	 * cái này dùng thư viện NIO để đọc file ra 1 byte array
-		import java.nio.file.Files;
-		import java.nio.file.Paths;
-		import java.nio.file.Path;
-	 */
-	public static byte[] readFile2ByteArray(String filename) throws IOException {
 
-		Path path = Paths.get(filename);
-		byte[] data = Files.readAllBytes(path);
-
-		return data;
-
-	}
 
 }
