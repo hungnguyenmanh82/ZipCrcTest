@@ -28,17 +28,18 @@ public class App4_zip_directory_recursively {
 	
 
     public static void main(String[] args) throws IOException {
-    	//"zipTestDirectory" is a recursive folder
-        String sourceFile = "zipTestDirectory";
+    	//zipTestDirectory: là folder path chứa cả file và folder nhiều cấp
+        String fileToZipPath = "zipTestDirectory";
+        //
         FileOutputStream fos = new FileOutputStream("dirCompressed.zip");
-        //=========================
         ZipOutputStream zipOut = new ZipOutputStream(fos);
-		//==================== zip configuration
+		//zip configuration
         zipOut.setMethod(ZipOutputStream.DEFLATED);
         zipOut.setLevel(9); //level for ZipOutputStream.DEFLATED
 
 		//============================	
-        File fileToZip = new File(sourceFile);
+        File fileToZip = new File(fileToZipPath);
+        
         zipFile(fileToZip, fileToZip.getName(), zipOut); // .getName() = name ko gồm path
         zipOut.close();
         fos.close();
@@ -60,10 +61,12 @@ public class App4_zip_directory_recursively {
         	
             File[] children = fileToZip.listFiles();
             for (File childFile : children) {
+            	//recursively
                 zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
             }
             return;
         }
+        
         // if it is a file
         FileInputStream fis = new FileInputStream(fileToZip);
         ZipEntry zipEntry = new ZipEntry(fileName); //fileName = relative path = "directory/name"

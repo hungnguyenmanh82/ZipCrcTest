@@ -16,7 +16,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * http://www.baeldung.com/java-compress-and-uncompress
  * 
- * Hỗ trợ unzip 1 file chứa nhiều items và folder recursively
+ * Hỗ trợ unzip *.zip chứa nhiều items và folder recursively
  */
 /**
  * code này đã test chạy tốt. Lúc nào dùng thì bỏ các dòng log.debug() đi là ok
@@ -85,7 +85,7 @@ public class App1_unzip_archive {
 		log.debug("destFilePath: " + destFilePath);
 
 		/**
-		 * 
+		 * zipEntry.getName(): nếu chứa absolute path thì throws exception
 		 */
 		if (!destFilePath.startsWith(destDirPath + File.separator)) {
 			throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
