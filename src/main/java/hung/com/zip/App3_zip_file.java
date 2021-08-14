@@ -13,6 +13,9 @@ import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * lúc compile sẽ gộp "main/resources/" và "main/java/" vào 1 folder chung
  App81_https_Server.class.getResource("/") = root = main/resources/ = main/java/
@@ -45,11 +48,27 @@ import java.util.zip.ZipOutputStream;
  * http://www.baeldung.com/java-compress-and-uncompress
  */
 public class App3_zip_file {
+	private static Logger log = LogManager.getLogger(); 
+	
+	public static void main(String[] args){
 
-	public static void main(String[] args) throws IOException{
-
-		String fileName = "testZip.txt";
-		FileInputStream fileInputStream = new FileInputStream(fileName); // xem testZip.txt ở project folder
+		File file = new File("./testZip.txt");
+		try {
+			zipFile(file);
+		} catch (Exception e) {
+			log.error("fail", e);
+		}
+	}
+	
+	/**
+	 *  chỉ zip từn file 1, vì zip tới đâu thì gửi về local tới đó
+	 *  zipEntry name = fileName (ko kèm path). FileName đã đầy đủ thông tin về AppName, Date rồi 
+	 */
+	public static void zipFile(File file) throws Exception {
+		
+		
+		// STEP 1:  read file logs
+		FileInputStream fileInputStream = new FileInputStream(file); // xem testZip.txt ở project folder
 		BufferedInputStream bufInputStream = new BufferedInputStream(fileInputStream, 8192); //DEFAULT_BUFFER_SIZE = 8192
 		
 		/**
@@ -61,14 +80,17 @@ public class App3_zip_file {
 		byte[] buf = new byte[4096];
 		int lengthBuf = 0;
 		
-		//zip data sẽ ghi vào file "hello-world.zip"
-		FileOutputStream fos = new FileOutputStream("hello-world.zip");
-		BufferedOutputStream bos = new BufferedOutputStream(fos, 8192); //DEFAULT_BUFFER_SIZE = 8192
+		// STEP 2: zipFileName = logFilePath + ".zip"
+		String zipName = file.getPath() + ".zip";
+		FileOutputStream fos = new FileOutputStream(zipName);
+		BufferedOutputStream bufOutStream = new BufferedOutputStream(fos, 8192); //DEFAULT_BUFFER_SIZE = 8192
 
 		// try() statement là ở Java 8
-		// try() sẽ tự động close FileInputStream sau khi hoàn thành
+		// try() sẽ tự động close ZipOutputStream sau khi hoàn thành
 		// https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html 
-		try(ZipOutputStream zipOutputStream = new ZipOutputStream(bos)) {
+		try {
+			ZipOutputStream zipOutputStream = new ZipOutputStream(bufOutStream);
+			
 			//==================== zip configuration
 			zipOutputStream.setMethod(ZipOutputStream.DEFLATED);
 			zipOutputStream.setLevel(9); //level for ZipOutputStream.DEFLATED
@@ -78,17 +100,17 @@ public class App3_zip_file {
 			 *  Mỗi entry sẽ tương ứng với 1 file và 1 checksum CRC32
 			 *  Nhiều entries là nhiều file
 			 */
-			ZipEntry entry = new ZipEntry(fileName); //tên của Entry trong hello-world.zip file
+			ZipEntry entry = new ZipEntry(file.getName()); //tên của Entry trong hello-world.zip file
 
 			zipOutputStream.putNextEntry(entry);
 			
-			lengthBuf = bufInputStream.read(buf);
+			
 			
 			/**
 			 * Nếu file đang đc ghi vào thì end of file sẽ bị sai
 			 * end of File ở thời điểm ta read thôi
 			 */
-			while(lengthBuf >= 0 ) {
+			while((lengthBuf = bufInputStream.read(buf)) >= 0 ) {
 				zipOutputStream.write(buf, 0, lengthBuf);
 			}
 			
@@ -100,27 +122,17 @@ public class App3_zip_file {
 			/* use more Entries to add more files
 		     and use closeEntry() to close each file entry */	  
 			System.out.println("zip successfull");
-
-
-		} catch(IOException ioe) {
-			ioe.printStackTrace();
+			
+			//
+			zipOutputStream.flush();
+			zipOutputStream.close();
+			bufOutStream.close();
+			
+			bufInputStream.close();
+		} catch(IOException e) {
+			throw e; // xử lý sau
 		}
-
 	}
 
-	/**
-	 * cái này dùng thư viện NIO để đọc file ra 1 byte array
-		import java.nio.file.Files;
-		import java.nio.file.Paths;
-		import java.nio.file.Path;
-	 */
-	public static byte[] readFile2ByteArray(String filename) throws IOException {
-
-		Path path = Paths.get(filename);
-		byte[] data = Files.readAllBytes(path);
-
-		return data;
-
-	}
 
 }
